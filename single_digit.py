@@ -78,16 +78,16 @@ biases = {
 }
 
 # Add summary ops to collect data
-tf.histogram_summary("wc1",   weights["wc1"])
-tf.histogram_summary("wc2",   weights["wc2"])
-tf.histogram_summary("wd1",   weights["wd1"])
-tf.histogram_summary("w_out", weights["out"])
-# tf.histogram_summary("b1",   biases["b1"])
-tf.histogram_summary("bc1",   biases["bc1"])
-tf.histogram_summary("bc2",   biases["bc2"])
-tf.histogram_summary("bd1",   biases["bd1"])
-tf.histogram_summary("b_out", biases["out"])
-tf.histogram_summary("y", y)
+tf.summary.histogram("wc1",   weights["wc1"])
+tf.summary.histogram("wc2",   weights["wc2"])
+tf.summary.histogram("wd1",   weights["wd1"])
+tf.summary.histogram("w_out", weights["out"])
+# tf.summary.histogram("b1",   biases["b1"])
+tf.summary.histogram("bc1",   biases["bc1"])
+tf.summary.histogram("bc2",   biases["bc2"])
+tf.summary.histogram("bd1",   biases["bd1"])
+tf.summary.histogram("b_out", biases["out"])
+tf.summary.histogram("y", y)
 
 # Construct model
 pred = conv_net(x, weights, biases, keep_prob)
@@ -96,16 +96,16 @@ pred = conv_net(x, weights, biases, keep_prob)
 with tf.name_scope("CostScope") as scope:
     cost = tf.reduce_mean(tf.nn.softmax_cross_entropy_with_logits(pred, y))
     optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
-    tf.scalar_summary("cost", cost)
+    tf.summary.scalar("cost", cost)
 
 # Evaluate model
 with tf.name_scope("AccuracyScope") as scope:
     correct_pred = tf.equal(tf.argmax(pred,1), tf.argmax(y,1))
     accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32))
-    tf.scalar_summary("accuracy", accuracy)
+    tf.summary.scalar("accuracy", accuracy)
 
 # Initializing the variables
-init = tf.initialize_all_variables()
+init = tf.global_variables_initializer()
 
 acc_list = []
 loss_list = []
@@ -113,8 +113,8 @@ loss_list = []
 def learn_by_accuracy():
     with tf.Session() as sess:
         # Merge all the summaries and write them out to /tmp/mnist_logs
-        merged = tf.merge_all_summaries()
-        writer = tf.train.SummaryWriter("./log", sess.graph.as_graph_def(add_shapes=True))
+        merged = tf.summary.merge_all()
+        writer = tf.summary.FileWriter("./log", sess.graph)
         # Run sesssion
         sess.run(init)
         step = 1
@@ -149,8 +149,8 @@ def learn_by_accuracy():
 def learn_by_examples():
     with tf.Session() as sess:
         # Merge all the summaries and write them out to /tmp/mnist_logs
-        merged = tf.merge_all_summaries()
-        writer = tf.train.SummaryWriter("./log", sess.graph.as_graph_def(add_shapes=True))
+        merged = tf.summary.merge_all()
+        writer = tf.summary.FileWriter("./log", sess.graph)
         # Run sesssion
         sess.run(init)
         step = 1

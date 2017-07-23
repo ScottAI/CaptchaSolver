@@ -99,8 +99,9 @@ optimizer = tf.train.AdamOptimizer(learning_rate=learning_rate).minimize(cost)
 correct_pred = tf.equal(tf.argmax(tf.reshape(pred, [-1, 6, 9]),2), tf.argmax(tf.reshape(y, [-1, 6, 9]),2))
 accuracy = tf.reduce_mean(tf.cast(correct_pred, tf.float32), 0)
 
-init = tf.initialize_all_variables()
+init = tf.global_variables_initializer()
 
+print("Optimization Started!")
 with tf.Session() as sess:
     sess.run(init)
     step = 1
